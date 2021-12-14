@@ -36,7 +36,7 @@ module.exports.findEmail = async function (employee, callback) { // employee hav
 		fn + ln + '@' + domain,
 	]
 
-
+	var emailsChecked = []
   for (let i = 0; i < emails.length; i++) {
     var url = 'https://isitarealemail.com/api/email/validate?email=' + emails[i]
 
@@ -51,9 +51,20 @@ module.exports.findEmail = async function (employee, callback) { // employee hav
 		console.log(res.data)
     console.log(emails[i])
 
+		emailsChecked.push({email: emails[i], status: res?.data?.status})
+
 		if (res?.data?.status == 'valid') {
 			employee.email = emails[i]
       break;
+		}
+
+		if (i == emails.length - 1) {
+			console.log(emailsChecked)
+			emailsChecked = emailsChecked.filter(check => check.status == 'unknown')
+			console.log(emailsChecked)
+			if (emailsChecked.length == 1) {
+				employee.email = emailsChecked[0].email
+			}
 		}
   }
 
